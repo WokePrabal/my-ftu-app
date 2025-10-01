@@ -1,8 +1,10 @@
 "use client"; // client component banane ke liye zaroori
 
 import { useRouter } from "next/navigation";
-import axios from "axios";
-import Sidebar from "../../components/sidebar";
+//import axios from "axios";
+
+import Sidebar from "@/components/Sidebar";
+
 
 export default function StreamPage() {
   const router = useRouter();

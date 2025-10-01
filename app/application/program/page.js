@@ -1,63 +1,71 @@
-// pages/program-of-study.js
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/router';
-import Sidebar from '../../../components/Sidebar';
+"use client"; // ye line sabse upar daalni hai
+
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation"; // ✅ fixed
+import Sidebar from "@/components/Sidebar";   // ✅ use alias (ya relative sahi path)
 
 const OPTIONS = {
-  "Bachelor's": [
-    'Bachelor of Science in Computer Science (BSCS)',
-    'Bachelor of Science in Business Administration (BSBA)'
+  bachelors: [
+    "Bachelor of Science in Computer Science (BSCS)",
+    "Bachelor of Science in Business Administration (BSBA)",
   ],
-  "Master's": [
-    'Master of Science in Computer Science (MSCS)',
-    'Master of Business Administration (MBA)'
+  masters: [
+    "Master of Science in Computer Science (MSCS)",
+    "Master of Business Administration (MBA)",
   ],
-  "PhD": [
-    'Doctorate in Computer Science',
-    'Doctorate in Business Administration'
-  ]
-}
+  phd: [
+    "Doctorate in Computer Science",
+    "Doctorate in Business Administration",
+  ],
+};
 
-export default function ProgramOfStudy() {
+export default function ProgramPage() {
   const router = useRouter();
-  const { appId } = router.query;
-  const [stream, setStream] = useState(null);
-  const [degree, setDegree] = useState('');
-  const [app, setApp] = useState(null);
+  const [programs, setPrograms] = useState([]);
+  const [selectedStream, setSelectedStream] = useState("");
+  const [selectedProgram, setSelectedProgram] = useState("");
 
-  useEffect(()=>{
-    if (!appId) return;
-    axios.get(`/api/applications/${appId}`).then(r => {
-      setApp(r.data);
-      setStream(r.data.stream);
-    });
-  },[appId]);
+  useEffect(() => {
+    // Example: tu API call se bhi fetch kar sakta hai, abhi dummy logic
+    const stream = "bachelors"; // stream tu localStorage, context, ya API se laa
+    setSelectedStream(stream);
+    setPrograms(OPTIONS[stream] || []);
+  }, []);
 
-  const saveAndContinue = async () => {
-    await axios.put(`/api/applications/${appId}`, {
-      degree,
-      stepsCompleted: { programOfStudy: true }
-    });
-    router.push(`/upload-documents?appId=${appId}`);
-  }
+  const handleNext = () => {
+    if (!selectedProgram) {
+      alert("Please select a program before continuing!");
+      return;
+    }
+    router.push("/application/upload");
+  };
 
   return (
     <div className="flex">
-      <Sidebar userId={app?.userId}/>
-      <main className="p-8 flex-1">
-        <h1 className="text-2xl mb-4">Program of Study</h1>
-        <div>
-          <label>Degree to Apply</label>
-          <select value={degree} onChange={e=>setDegree(e.target.value)} className="block mt-2 p-2 border">
-            <option value="">Select</option>
-            {(OPTIONS[stream] || []).map(o => <option key={o} value={o}>{o}</option>)}
-          </select>
-          <div className="mt-4">
-            <button className="px-4 py-2 border" onClick={saveAndContinue} disabled={!degree}>Save & Continue</button>
-          </div>
-        </div>
-      </main>
+      <Sidebar />
+      <div className="p-6 flex-1">
+        <h1 className="text-2xl font-bold mb-4">Program of Study</h1>
+        <select
+          className="border rounded p-2 mb-4 w-full"
+          value={selectedProgram}
+          onChange={(e) => setSelectedProgram(e.target.value)}
+        >
+          <option value="">-- Select a program --</option>
+          {programs.map((p, idx) => (
+            <option key={idx} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+
+        <button
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+          onClick={handleNext}
+        >
+          Continue
+        </button>
+      </div>
     </div>
   );
 }
