@@ -1,39 +1,44 @@
-import dbConnect from "@/utils/db";
-import Application from "@/models/Application";
+// pages/api/applications/[id].js
+import dbConnect from "../../../lib/db";
+import Application from "../../../lib/models/Application";
+
+import mongoose from "mongoose";
 
 export default async function handler(req, res) {
-  await dbConnect();
+  try {
+    await dbConnect();
+  } catch (dbErr) {
+    console.error("[api/applications/[id]] DB connect error:", dbErr);
+    return res.status(500).json({ success: false, error: "DB connect failed" });
+  }
 
   const { id } = req.query;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ success: false, error: "Invalid id" });
+  }
 
-  if (req.method === "GET") {
-    try {
-      const application = await Application.findById(id);
-      if (!application) return res.status(404).json({ success: false });
-      res.status(200).json({ success: true, data: application });
-    } catch (error) {
-      res.status(400).json({ success: false });
+  try {
+    if (req.method === "GET") {
+      const app = await Application.findById(id);
+      if (!app) return res.status(404).json({ success: false, error: "Not found" });
+      return res.status(200).json({ success: true, data: app });
     }
-  } else if (req.method === "PUT") {
-    try {
-      const application = await Application.findByIdAndUpdate(id, req.body, {
-        new: true,
-        runValidators: true,
-      });
-      if (!application) return res.status(404).json({ success: false });
-      res.status(200).json({ success: true, data: application });
-    } catch (error) {
-      res.status(400).json({ success: false });
+
+    if (req.method === "PUT") {
+      const updated = await Application.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+      if (!updated) return res.status(404).json({ success: false, error: "Not found" });
+      return res.status(200).json({ success: true, data: updated });
     }
-  } else if (req.method === "DELETE") {
-    try {
-      const deleted = await Application.deleteOne({ _id: id });
-      if (!deleted.deletedCount) return res.status(404).json({ success: false });
-      res.status(200).json({ success: true });
-    } catch (error) {
-      res.status(400).json({ success: false });
+
+    if (req.method === "DELETE") {
+      await Application.findByIdAndDelete(id);
+      return res.status(200).json({ success: true });
     }
-  } else {
-    res.status(405).json({ success: false, message: "Method not allowed" });
+    
+    res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+  } catch (err) {
+    console.error("[api/applications/[id]] error:", err);
+    res.status(500).json({ success: false, error: err.message });
   }
 }

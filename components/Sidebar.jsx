@@ -27,6 +27,15 @@ export default function Sidebar({ progress = {} }) {
         </li>
         <li>
           <Link
+            href="/application/personalDetails"
+            className="flex items-center justify-between"
+          >
+            <span>Personal Details</span>
+            {progress.personalDetails ? <span>✅</span> : null}
+          </Link>
+        </li>
+        <li>
+          <Link
             href="/application/upload"
             className="flex items-center justify-between"
           >
@@ -34,6 +43,7 @@ export default function Sidebar({ progress = {} }) {
             {progress.upload ? <span>✅</span> : null}
           </Link>
         </li>
+
         <li>
           <Link
             href="/application/review"

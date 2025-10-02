@@ -24,3 +24,78 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* globals.css (append) */
+
+.ftu-header {
+  background: #8B0000;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+}
+
+.ftu-header__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ftu-header__brand {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #fff; 
+  letter-spacing: 0.2px;
+}
+
+.ftu-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ftu-header__link {
+  display: inline-block;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #fff;
+  background: transparent;
+  transition: background 120ms ease, color 120ms ease, transform 120ms ease;
+  border: 1px solid transparent;
+}
+
+
+
+/* Layout helpers */
+.app-shell {
+  display: flex;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 1.2rem auto;
+  padding: 0 1rem;
+}
+
+/* If you render a sidebar: */
+.app-shell__sidebar {
+  width: 260px; /* adjust */
+  flex: 0 0 260px;
+}
+
+/* main content area expands */
+.app-shell__main {
+  flex: 1 1 auto;
+}
+
+/* small-screen adjustments */
+@media (max-width: 768px) {
+  .ftu-header__inner { padding: 0.6rem; }
+  .app-shell { margin: 0.6rem auto; flex-direction: column; }
+  .app-shell__sidebar { width: 100%; flex: none; }
+}
